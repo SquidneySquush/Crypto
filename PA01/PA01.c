@@ -5,8 +5,12 @@
 
 int main(int argc, const char* argv[]){
 
-    FILE *fp;
-    fp = fopen("./input", "r");
+   // FILE *fp;
+    //fp = fopen("./input", "r");
+
+  mpz_t m_og, c2, d2, p2, q2;
+  mpz_inits(m_og, c2, d2, p2, q2, NULL);
+  gmp_sscanf(argv[1], "%Zd,%Zd,%Zd,%Zd,%Zd,", m_og, c2, d2, p2, q2);
 
 // generate random p/q s.t n > 1000 bits
   gmp_randstate_t state;
@@ -52,7 +56,7 @@ int main(int argc, const char* argv[]){
   mpz_invert(d, e, E_tot);
 
   mpz_t c;
-  mpz_powm(c, m_original, e, n);
+  mpz_powm(c, m_og, e, n);
 
   mpz_t n2;
   mpz_mul(n2, p2, q2);
