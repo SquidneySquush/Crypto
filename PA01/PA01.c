@@ -8,9 +8,9 @@ int main(int argc, const char* argv[]){
    // FILE *fp;
     //fp = fopen("./input", "r");
 
-  mpz_t m_og, c2, d2, p2, q2;
-  mpz_inits(m_og, c2, d2, p2, q2, NULL);
-  gmp_sscanf(argv[1], "%Zd,%Zd,%Zd,%Zd,%Zd,", m_og, c2, d2, p2, q2);
+  mpz_t m_og, c1, d1, p1, q1;
+  mpz_inits(m_og, c1, d1, p1, q1, NULL);
+  gmp_sscanf(argv[1], "%Zd,%Zd,%Zd,%Zd,%Zd,", m_og, c1, d1, p1, q1);
 
 // generate random p/q s.t n > 1000 bits
   gmp_randstate_t state;
@@ -34,11 +34,11 @@ int main(int argc, const char* argv[]){
     mpz_mul(n, p, q);
   }
 
- mpz_t p_sub, q_sub, E_tot;
-  mpz_t one;
-  mpz_init_set_str(one, "1", 10);
-  mpz_sub(p_sub, p, one);
-  mpz_sub(q_sub, q, one);
+  mpz_t p_sub, q_sub, E_tot;
+  mpz_t a;
+  mpz_init_set_str(a, "1", 10);
+  mpz_sub(p_sub, p, a);
+  mpz_sub(q_sub, q, a);
   mpz_mul(E_tot, p_sub, q_sub);
 
   mpz_t e, gcd;
@@ -48,7 +48,7 @@ int main(int argc, const char* argv[]){
 
   mpz_gcd(gcd, e, E_tot);
   while( mpz_get_ui(gcd) != 1){
-    mpz_add(e, e, one);
+    mpz_add(e, e, a);
     mpz_gcd(gcd, e, E_tot);
   }
 
@@ -59,10 +59,10 @@ int main(int argc, const char* argv[]){
   mpz_powm(c, m_og, e, n);
 
   mpz_t n2;
-  mpz_mul(n2, p2, q2);
+  mpz_mul(n2, p1, q1);
 
   mpz_t m_final;
-  mpz_powm(m_final, c2, d2, n2);
+  mpz_powm(m_final, c1, d1, n2);
   gmp_printf("%Zd,%Zd,%Zd,%Zd,%Zd", c, e, d, n, m_final);
 
     return 0;
