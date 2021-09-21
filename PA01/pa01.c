@@ -65,7 +65,7 @@ int main(int argc, const char* argv[]){
     mpz_powm(m2, c, d, n);
 
 
-    fp = fopen("./input", "w+");
+    fp = fopen("./output", "w+");
     if (fp == NULL){
         printf("\"./output\" does not exist.\n");
         return 0;
