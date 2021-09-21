@@ -20,7 +20,7 @@ int main(int argc, const char* argv[]){
     }
 
     fgets(buf, 5000, (FILE*)fp); 
-    gmp_sscanf(buf, "%Zd,%Zd,%Zd,%Zd,%Zd", m_original, c2, d2, p2, q2,); // read input into variables
+    gmp_sscanf(buf, "%Zd,%Zd,%Zd,%Zd,%Zd", m_original, c2, d2, p2, q2); // read input into variables
     fclose(fp); // close file and release memory
 
     // generate random p/q s.t n > 1000 bits
@@ -72,7 +72,7 @@ int main(int argc, const char* argv[]){
     }
     gmp_fprintf(fp, "%Zd,%Zd,%Zd,%Zd,%Zd", c, e, d, n, m2);
 
-    fclose(fp)
+    fclose(fp);
 
     return 0;
 }
