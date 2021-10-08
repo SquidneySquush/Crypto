@@ -8,8 +8,8 @@
 int main(int argc, const char* argv[]){
 
     //initialize int variables for input
-    mpz_t m, x, g, p, c11, c12, c21, c22, c31, c32;
-    mpz_inits(m, g, x, p, c11, c12, c21, c22, c31, c32, NULL);
+    mpz_t m, x, g, p, h, c11, c12, c21, c22, c31, c32;
+    mpz_inits(m, g, x, p, h, c11, c12, c21, c22, c31, c32, NULL);
     // Assign x to private key given in directions
     //mpz_init2(x, 200);
     //mpz_set_ui(x, 1234567890123456789012345678901234567890);
@@ -38,12 +38,20 @@ int main(int argc, const char* argv[]){
     mpz_nextprime(p, rand);
     mpz_urandomb(g,state,2000);
     
+    //make sure g is greaater than x
+    while( mpz_cmp(g,x)<0 ){ 
+        mpz_urandomb(9,state,n);
+    }
+    
     // Make sure that p > g
     while(mpz_cmp(p,g)<0){
-        mpz_randomb(g,state,2000);
+        mpz_urandomb(p,state,2000);
+        mpz_nextprime(p, p);
     }
     
     gmp_randclear(state);
+    
+    mpz_powm(h,g,x,p);
 
 
 
