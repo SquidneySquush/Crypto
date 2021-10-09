@@ -12,7 +12,7 @@ int main(int argc, const char* argv[]){
 	time_t t;
 
 	//initialize int variables for input
-	mpz_t m, x, g, p, q, h, r, hr, p_qr, g2, gx, random, gen, one, two; 
+	mpz_t m, x, g, p, q, h, r, hr, p_qr, g2, gx, random, gen, one, two, seed; 
 	mpz_t c1[count];
 	mpz_t c2[count];	
 	
@@ -38,7 +38,7 @@ int main(int argc, const char* argv[]){
 
 	while (count !=0){
 		
-		mpz_inits(m, g, x, p, q, h, r, hr, p_qr, g2, gx, gen, NULL);
+		mpz_inits(m, g, x, p, q, h, r, hr, p_qr, g2, gx, gen, seed, NULL);
 
 		for( int j = 0; j< 3; j=j+1){
 			mpz_init(c1[j]);
@@ -50,8 +50,8 @@ int main(int argc, const char* argv[]){
 		gmp_randinit_mt(state);
 
 		//srand((unsigned) time(&t));
-		int seed = getpid();
-		//mpf_urandomb();
+		//int seed = getpid();
+		mpf_urandomb(seed, state,2000);
 		mpz_init(random);
 		mpz_urandomb(random, state, 2000);
 		
@@ -84,19 +84,7 @@ int main(int argc, const char* argv[]){
 			}
 
 		}
-
-		/*
-		//make sure g is greaater than x
-		while( mpz_cmp(g,x)<0 ){ 
-		mpz_urandomb(9,state,n);
-		}
-
-		// Make sure that p > g
-		while(mpz_cmp(p,g)<0){
-		mpz_urandomb(p,state,2000);
-		mpz_nextprime(p, p);
-		}
-		*/     
+    
 		mpz_powm(h,gen,x,p);
 
 		//------------------------Encryption-------------------------//
