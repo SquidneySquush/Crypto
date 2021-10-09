@@ -15,13 +15,7 @@ int main(int argc, const char* argv[]){
 	mpz_t m, x, g, p, q, h, r, hr, p_qr, g2, gx, random, gen, one, two; 
 	mpz_t c1[count];
 	mpz_t c2[count];	
-	mpz_inits(m, g, x, p, q, h, r, hr, p_qr, g2, gx, gen, NULL);
-
-	for( int j = 0; j< 3; j=j+1){
-		mpz_init(c1[j]);
-		mpz_init(c2[j]);
-	}
-
+	
 	// Assign x to private key given in directions
 	const char str[] = "1234567890123456789012345678901234567890";
 	mpz_set_str(x, str, 10);    // parse the string as a base-10 number
@@ -43,12 +37,20 @@ int main(int argc, const char* argv[]){
 	fclose(fp); // close file and release memory
 
 	while (count !=0){
+		
+		mpz_inits(m, g, x, p, q, h, r, hr, p_qr, g2, gx, gen, NULL);
+
+		for( int j = 0; j< 3; j=j+1){
+			mpz_init(c1[j]);
+			mpz_init(c2[j]);
+		}
+		
 		// generate p s.t p > 2000 bits
 		gmp_randstate_t state;
 		gmp_randinit_mt(state);
 
-		srand((unsigned) time(&t));
-		int seed = rand();
+		//srand((unsigned) time(&t));
+		int seed = time(NULL);
 		mpz_init(random);
 		mpz_urandomb(random, state, 2000);
 
