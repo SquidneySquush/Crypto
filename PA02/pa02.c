@@ -7,17 +7,26 @@
 #include <time.h>
 
 int main(int argc, const char* argv[]){
-
+	int count = 3;
+	int i= 0;
 	time_t t;
 
 	//initialize int variables for input
-	mpz_t m, x, g, p, h, r, hr, p_qr, g2, gx, random, gen, one, c11, c12;	//, c21, c22, c31, c32;
-	mpz_inits(m, g, x, p, h, r, hr, p_qr, g2, gx, gen, one, c11, c12, NULL);		//, c21, c22, c31, c32, NULL);
+	mpz_t m, x, g, p, q, h, r, hr, p_qr, g2, gx, random, gen, one, two; 
+	mpz_t c1[count];
+	mpz_t c2[count];	
+	mpz_inits(m, g, x, p, q, h, r, hr, p_qr, g2, gx, gen, NULL);
+
+	for( int j = 0; j< 3; j=j+1){
+		mpz_init(c1[j]);
+		mpz_init(c2[j]);
+	}
+
 	// Assign x to private key given in directions
-	//mpz_init2(x, 200);
-	//mpz_set_ui(x, 1234567890123456789012345678901234567890);
 	const char str[] = "1234567890123456789012345678901234567890";
 	mpz_set_str(x, str, 10);    // parse the string as a base-10 number
+	mpz_init_set_str(one, "1", 10);
+	mpz_init_set_str(two, "2", 10);
 
 	FILE *fp;
 	char buf[5000];
@@ -33,82 +42,90 @@ int main(int argc, const char* argv[]){
 	gmp_sscanf(buf, "%Zd", m); // read input into variables
 	fclose(fp); // close file and release memory
 
-	// generate p s.t p > 2000 bits
-	gmp_randstate_t state;
-	gmp_randinit_mt(state);
+	while (count !=0){
+		// generate p s.t p > 2000 bits
+		gmp_randstate_t state;
+		gmp_randinit_mt(state);
+
+		srand((unsigned) time(&t));
+		int seed = rand();
+		mpz_init(random);
+		mpz_urandomb(random, state, 2000);
+
+		mpz_nextprime(q, random);
+		mpz_mul(p, q, two);
+		mpz_add(p, p, one);
+
+		//find random g
+		gmp_randseed_ui(state, seed);
+		mpz_urandomb(g,state,2000); //find random g
+		//mpz_urandomb(r,state,2000);
 
 
-	//find random g
-	srand((unsigned) time(&t));
-	int seed = rand();
-	mpz_init(random);
-	mpz_urandomb(random, state, 2000);
-	mpz_nextprime(p, random);
-	gmp_randseed_ui(state, seed);
-	mpz_urandomb(g,state,2000); //find random g
-	//mpz_urandomb(r,state,2000);
+		mpz_set(p_qr, p);
+		//mpz_set_ui(one, 1);
+		mpz_submul_ui(p_qr, one, 0.5);
 
+		//calculate generator that is safe from QR/QNR attacks
+		while (mpz_cmp(g, p) != 0) {
+			mpz_powm(gx, g, p_qr, p); //g^((p-1)/2) mod p
+			mpz_powm_ui(g2, g, 2, p); //g^2 mod p
 
-	mpz_set(p_qr, p);
-	mpz_set_ui(one, 1);
-	mpz_submul_ui(p_qr, one, 0.5);
+			if (!(mpz_cmp_ui(gx, 1) == 0) && !(mpz_cmp_ui(g2, 1) == 0)) {
+				mpz_set(gen, g);
+				break;
+			}
+			else {
+				mpz_urandomb(g, state, 2000);
+			}
 
-    //calculate generator that is safe from QR/QNR attacks
-	while (mpz_cmp(g, p) != 0) {
-		mpz_powm(gx, g, p_qr, p); //g^((p-1)/2) mod p
-		mpz_powm_ui(g2, g, 2, p); //g^2 mod p
-
-		if (!(mpz_cmp_ui(gx, 1) == 0) && !(mpz_cmp_ui(g2, 1) == 0)) {
-		    mpz_set(gen, g);
-		    break;
 		}
-		else {
-		    mpz_urandomb(g, state, 2000);
+
+		/*
+		//make sure g is greaater than x
+		while( mpz_cmp(g,x)<0 ){ 
+		mpz_urandomb(9,state,n);
 		}
 
-	}
+		// Make sure that p > g
+		while(mpz_cmp(p,g)<0){
+		mpz_urandomb(p,state,2000);
+		mpz_nextprime(p, p);
+		}
+		*/     
+		mpz_powm(h,gen,x,p);
 
-	/*
-	//make sure g is greaater than x
-	while( mpz_cmp(g,x)<0 ){ 
-	mpz_urandomb(9,state,n);
-	}
+		//------------------------Encryption-------------------------//
 
-	// Make sure that p > g
-	while(mpz_cmp(p,g)<0){
-	mpz_urandomb(p,state,2000);
-	mpz_nextprime(p, p);
-	}
-	*/     
-	mpz_powm(h,gen,x,p);
-
-	//------------------------Encryption-------------------------//
-
-	mpz_urandomb(r,state,2000);
-
-	// make sure that p is greater than k
-	while( mpz_cmp(p,r)<0 ) {
 		mpz_urandomb(r,state,2000);
+
+		// make sure that p is greater than k
+		while( mpz_cmp(p,r)<0 ) {
+			mpz_urandomb(r,state,2000);
+		}
+
+		mpz_powm(c1[i], gen, r, p);  // calculate c11
+		mpz_powm(hr, h, r, p);  // calculate h^r
+		mpz_mul(c2[i], m, hr); // calculate c12 
+
+		gmp_randclear(state);
+
+		count = count -1;
+		i= i +1;
+
 	}
-
-	mpz_powm(c11, gen, r, p);  // calculate c11
-	mpz_powm(hr, h, r, p);  // calculate h^r
-	mpz_mul(c12, m, hr); // calculate c12 
-
-	//------------------------Check If QR/QNR safe-------------------------//
-
-
-
-	gmp_randclear(state);
-
 
 	fp = fopen("./output", "w+");
 	if (fp == NULL){
 		printf("\"./output\" does not exist.\n");
 		return 0;
 	}
-	gmp_fprintf(fp,"%Zd,%Zd,%Zd\n", c11, c12, p);		
-		//,%Zd,%Zd\n%Zd,%Zd,%Zd", c11, c12, p, c21, c22, p, c31, c32, p);
+
+	for( int k = 0; k< 3; k=k+1){
+		gmp_fprintf(fp,"%Zd,%Zd,%Zd\n", c1[k], c2[k], p);		
+	}	
+		
+
 
 	fclose(fp);
 
