@@ -42,7 +42,7 @@ int main(int argc, const char* argv[]){
 	srand((unsigned) time(&t));
 	int seed = rand();
 	mpz_init(random);
-	mpz_urandomb(rand, state, 2000);
+	mpz_urandomb(random, state, 2000);
 	mpz_nextprime(p, random);
 	gmp_randseed_ui(state, seed);
 	mpz_urandomb(g,state,2000); //find random g
@@ -51,7 +51,7 @@ int main(int argc, const char* argv[]){
 
 	mpz_set(p_qr, p);
 	mpz_set_ui(one, 1);
-	mpz_submul_ui(p_qr, 1, 0.5);
+	mpz_submul_ui(p_qr, one, 0.5);
 
     //calculate generator that is safe from QR/QNR attacks
 	while (mpz_cmp(g, p) != 0) {
