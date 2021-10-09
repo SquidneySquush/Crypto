@@ -50,9 +50,11 @@ int main(int argc, const char* argv[]){
 		gmp_randinit_mt(state);
 
 		//srand((unsigned) time(&t));
-		int seed = time(NULL);
+		int seed = getpid();
+		//mpf_urandomb();
 		mpz_init(random);
 		mpz_urandomb(random, state, 2000);
+		
 
 		mpz_nextprime(q, random);
 		mpz_mul(p, q, two);
