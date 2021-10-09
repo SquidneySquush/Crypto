@@ -8,9 +8,11 @@
 
 int main(int argc, const char* argv[]){
 
+	time_t t;
+
 	//initialize int variables for input
-	mpz_t m, x, g, p, h, r, hr, p_qr, g2, gx, rand, gen, c11, c12;	//, c21, c22, c31, c32;
-	mpz_inits(m, g, x, p, h, r, hr, p_qr, g2, gx, gen, c11, c12, NULL);		//, c21, c22, c31, c32, NULL);
+	mpz_t m, x, g, p, h, r, hr, p_qr, g2, gx, random, gen, one, c11, c12;	//, c21, c22, c31, c32;
+	mpz_inits(m, g, x, p, h, r, hr, p_qr, g2, gx, gen, one, c11, c12, NULL);		//, c21, c22, c31, c32, NULL);
 	// Assign x to private key given in directions
 	//mpz_init2(x, 200);
 	//mpz_set_ui(x, 1234567890123456789012345678901234567890);
@@ -37,11 +39,11 @@ int main(int argc, const char* argv[]){
 
 
 	//find random g
-	srand(time(0));
+	srand((unsigned) time(&t));
 	int seed = rand();
-	mpz_init(rand);
+	mpz_init(random);
 	mpz_urandomb(rand, state, 2000);
-	mpz_nextprime(p, rand);
+	mpz_nextprime(p, random);
 	gmp_randseed_ui(state, seed);
 	mpz_urandomb(g,state,2000); //find random g
 	//mpz_urandomb(r,state,2000);
@@ -91,7 +93,7 @@ int main(int argc, const char* argv[]){
 
 	mpz_powm(c11, gen, r, p);  // calculate c11
 	mpz_powm(hr, h, r, p);  // calculate h^r
-	mpz_mul_ui(c12, m, hr); // calculate c12 
+	mpz_mul(c12, m, hr); // calculate c12 
 
 	//------------------------Check If QR/QNR safe-------------------------//
 
